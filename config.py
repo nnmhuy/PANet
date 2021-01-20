@@ -21,6 +21,7 @@ sources_to_save = list(itertools.chain.from_iterable(
 for source_file in sources_to_save:
     ex.add_source_file(source_file)
 
+
 @ex.config
 def cfg():
     """Default configurations"""
@@ -28,8 +29,7 @@ def cfg():
     seed = 1234
     cuda_visable = '0, 1, 2, 3, 4, 5, 6, 7'
     gpu_id = 0
-    mode = 'test' # 'train' or 'test'
-
+    mode = 'test'  # 'train' or 'test'
 
     if mode == 'train':
         dataset = 'VOC'  # 'VOC' or 'COCO'
@@ -78,7 +78,7 @@ def cfg():
 
         # Set model config from the snapshot string
         model = {}
-        for key in ['align',]:
+        for key in ['align', ]:
             model[key] = key in snapshot
 
         # Set label_sets from the snapshot string
@@ -94,21 +94,20 @@ def cfg():
     else:
         raise ValueError('Wrong configuration for "mode" !')
 
-
     exp_str = '_'.join(
-        [dataset,]
+        [dataset, ]
         + [key for key, value in model.items() if value]
         + [f'sets_{label_sets}', f'{task["n_ways"]}way_{task["n_shots"]}shot_[{mode}]'])
-
 
     path = {
         'log_dir': './runs',
         'init_path': './pretrained_model/vgg16-397923af.pth',
-        'VOC':{'data_dir': '../../data/Pascal/VOCdevkit/VOC2012/',
-               'data_split': 'trainaug',},
-        'COCO':{'data_dir': '../../data/COCO/',
-                'data_split': 'train',},
+        'VOC': {'data_dir': './data/Pascal/VOCdevkit/VOC2012/',
+                'data_split': 'trainaug', },
+        'COCO': {'data_dir': '../../data/COCO/',
+                 'data_split': 'train', },
     }
+
 
 @ex.config_hook
 def add_observer(config, command_name, logger):
@@ -121,6 +120,7 @@ def add_observer(config, command_name, logger):
             exp_name += '_scribble'
         if config['bbox']:
             exp_name += '_bbox'
-    observer = FileStorageObserver.create(os.path.join(config['path']['log_dir'], exp_name))
+    observer = FileStorageObserver.create(
+        os.path.join(config['path']['log_dir'], exp_name))
     ex.observers.append(observer)
     return config
